@@ -1,63 +1,28 @@
 const router = require("express").Router();
-const User = require("../models/User");
 const Post = require("../models/Post");
 
-// CREATE POST
+// Create a new interview post
 router.post("/", async (req, res) => {
   const newPost = new Post(req.body);
   try {
     const savedPost = await newPost.save();
-    res.status(200).json(savedPost);
+    res.status(201).json(savedPost);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-// UPDATE POST
-router.put("/:id", async (req, res) => {
+// Get all interview posts
+router.get("/", async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
-    if (post.username === req.body.username) {
-      try {
-        const updatedPost = await Post.findByIdAndUpdate(
-          req.params.id,
-          {
-            $set: req.body,
-          },
-          { new: true }
-        );
-        res.status(200).json(updatedPost);
-      } catch (err) {
-        res.status(500).json(err);
-      }
-    } else {
-      res.status(401).json("You can update only your post!");
-    }
+    const posts = await Post.find({});
+    res.status(200).json(posts);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-// DELETE POST
-router.delete("/:id", async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (post.username === req.body.username) {
-      try {
-        const deletedPost = await Post.findByIdAndRemove(req.params.id);
-        res.status(200).json({ message: "Operation Succeded", deletedPost });
-      } catch (err) {
-        res.status(500).json({ message: "No Data to Delete.", err });
-      }
-    } else {
-      res.status(401).json("You can delete only your post!");
-    }
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-
-// GET POST
+// Get an interview post by ID
 router.get("/:id", async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
@@ -67,24 +32,12 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// GET ALL POSTS
-router.get("/", async (req, res) => {
-  const username = req.query.user;
-  const compName = req.query.comp;
+// Delete an interview post by ID
+router.delete("/:id", async (req, res) => {
   try {
-    let posts;
-    if (username) {
-      posts = await Post.find({ username });
-    } else if (compName) {
-      posts = await Post.find({
-        companies: {
-          $in: [compName],
-        },
-      });
-    } else {
-      posts = await Post.find();
-    }
-    res.status(200).json(posts);
+    const post = await Post.findById(req.params.id);
+    await post.delete();
+    res.status(200).json("Post has been deleted...");
   } catch (err) {
     res.status(500).json(err);
   }

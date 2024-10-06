@@ -58,4 +58,34 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// add problemsolved to user
+router.put("/:id/addproblemsolved", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Ensure problemId is provided
+    const problemId = req.body.problemId;
+    if (!problemId) {
+      return res.status(400).json({ message: "Problem ID is required" });
+    }
+
+    // Add the problemId to the user's problemsSolved array
+    if (!user.problemsSolved.includes(problemId)) {
+      user.problemsSolved.push(problemId);
+      await user.save();
+      res.status(200).json({ message: "Problem added successfully" });
+    } else {
+      res.status(400).json({ message: "Problem already solved by user" });
+    }
+  } catch (err) {
+    console.error("Error adding problem:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
 module.exports = router;
