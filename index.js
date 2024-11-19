@@ -12,7 +12,13 @@ const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 
-app.use(cors());
+const corsOptions = {
+  origin: ["http://localhost:3000", "https://mitstpo.vercel.app"], // Add all allowed origins
+  methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed methods
+  credentials: true, // Allow cookies or authentication headers
+};
+
+app.use(cors(corsOptions));
 dotenv.config();
 app.use(express.json());
 app.use("/images", express.static(path.join(__dirname, "/images")));
