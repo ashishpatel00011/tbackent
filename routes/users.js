@@ -57,8 +57,9 @@ router.get("/:id", async (req, res) => {
     res.status(500).json(err);
   }
 });
+//
 
-// add problemsolved to user
+// Add problem solved to user
 router.put("/:id/addproblemsolved", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -66,26 +67,65 @@ router.put("/:id/addproblemsolved", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Ensure problemId is provided
-    const problemId = req.body.problemId;
+    const { problemId } = req.body;
     if (!problemId) {
       return res.status(400).json({ message: "Problem ID is required" });
     }
 
-    // Add the problemId to the user's problemsSolved array
+    // Add the problemId if not already in the user's problemsSolved array
     if (!user.problemsSolved.includes(problemId)) {
       user.problemsSolved.push(problemId);
       await user.save();
-      res.status(200).json({ message: "Problem added successfully" });
+      return res.status(200).json({ message: "Problem added successfully" });
     } else {
-      res.status(400).json({ message: "Problem already solved by user" });
+      return res
+        .status(400)
+        .json({ message: "Problem already solved by user" });
     }
   } catch (err) {
     console.error("Error adding problem:", err);
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 });
 
+// Delete problem solved from user
+router.delete("/:id/deleteproblemsolved/:problemId", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
+    const { problemId } = req.params;
+    const index = user.problemsSolved.indexOf(problemId);
 
+    if (index > -1) {
+      user.problemsSolved.splice(index, 1);
+      await user.save();
+      return res.status(200).json({ message: "Problem removed successfully" });
+    } else {
+      return res
+        .status(400)
+        .json({ message: "Problem not found in user's list" });
+    }
+  } catch (err) {
+    console.error("Error removing problem:", err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET USER PROBLEMS SOLVED
+router.get("/:id/problemsaved", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({ problemsSolved: user.problemsSolved });
+  } catch (err) {
+    console.error("Error fetching problems solved:", err);
+    return res.status(500).json({ error: err.message });
+  }
+});
 module.exports = router;
