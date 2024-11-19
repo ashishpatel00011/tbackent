@@ -5,8 +5,7 @@ const Problem = require("../models/problems");
 // @route   POST /problems
 // @desc    Add a new problem
 router.post("/", async (req, res) => {
-  const { type, name, leetcode_link, youtube_link, difficulty, category } =
-    req.body;
+  const { type, name, leetcode_link, youtube_link, difficulty, category } = req.body;
 
   try {
     const newProblem = new Problem({
@@ -25,12 +24,12 @@ router.post("/", async (req, res) => {
   }
 });
 
+
 router.get("/", async (req, res) => {
   try {
     const problems = await Problem.find();
     res.status(200).json(problems);
   } catch (err) {
-    console.log(err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -47,15 +46,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 router.put("/:id", async (req, res) => {
-  const {
-    type,
-    name,
-    leetcode_link,
-    github_link,
-    youtube_link,
-    difficulty,
-    category,
-  } = req.body;
+  const { type, name, leetcode_link, github_link, youtube_link, difficulty, category } = req.body;
 
   try {
     const updatedProblem = await Problem.findByIdAndUpdate(
@@ -73,5 +64,6 @@ router.put("/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 module.exports = router;

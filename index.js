@@ -12,13 +12,7 @@ const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 
-const corsOptions = {
-  origin: ["http://localhost:3000", "https://mitstpo.vercel.app"], // Add all allowed origins
-  methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed methods
-  credentials: true, // Allow cookies or authentication headers
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 dotenv.config();
 app.use(express.json());
 app.use("/images", express.static(path.join(__dirname, "/images")));
@@ -47,6 +41,10 @@ const upload = multer({ storage: storage });
 app.post("/api/upload", upload.single("file"), (req, res) => {
   res.status(200).json("File has been uploaded");
 });
+
+// app.use("/", (req, res) => {
+//   res.send("Welcome to Mitstpo API");
+// });
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
